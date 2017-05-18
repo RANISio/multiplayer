@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Multiplay Player</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.98.2/css/materialize.min.css">
+    <style media="screen">
+      video {
+        background-color: black;
+        width: 640px;
+        height: 380px;
+        margin: auto;
+        display: block;
+      }
+    </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.98.2/js/materialize.min.js"></script>
+    <script type="text/javascript">
+    $(document).ready(function() {
+      let mediaPlayers = window.mediaPlayers = $('.mediaPlayer'),
+          selectors = $('select'),
+          fileInputs = $('[type="file"]'),
+          // urlInputs = $('[type="text"]'),
+          playButton = $('#playButton'),
+          pauseButton = $('#pauseButton'),
+          fullScreenButton = $('#fullScreenButton');
+
+
+      navigator.getUserMedia({
+        audio: true,
+        video: false
+      }, function(localMediaStream) {
+        navigator.mediaDevices.enumerateDevices().then(setDeviceSelectors);
+      }, function(err) {
+        console.log(err);
+      });
+
+      function setDeviceSelectors(devices) {
+        $.each(devices, function(index, device) {
+          if(device.kind === 'audiooutput') {
+            selectors.append($('<option>', {value: device.deviceId, text: device.label}));
+          }
+        })
+        selectors.material_select();
+      }
+
+      playButton.click(function() {
+
+      });
+
+      fullScreenButton.click(function() {
+        mediaPlayers[0].webkitEnterFullscreen();
+      });
+
+      playButton.click(function() {
+        mediaPlayers.each(function(i, player) {
+          player.play();
+        });
+      });
+
+      pauseButton.click(function() {
+        mediaPlayers.each(function(i, player) {
+          player.pause();
+        });
+      });
+
+      fileInputs.each(function(i, input) {
+        $(input).change(function(e) {
+          mediaPlayers[i].setAttribute('src', URL.createObjectURL(this.files[0]));
+          mediaPlayers[i].load();
+        });
+      });
+
+      selectors.each(function(i, selector) {
+        $(selector).change(function(e) {
+          mediaPlayers[i].setSinkId(e.target.value)
+        });
+      });
+    });
+
+    </script>
+  </head>
+  <body>
+    <div class="container">
+      <div class="row">
+        <video class="mediaPlayer"></video>
+        <audio class="mediaPlayer"></audio>
+        <audio class="mediaPlayer"></audio>
+        <audio class="mediaPlayer"></audio>
+      </div>
+      <div class="row">
+        <div class="file-field input-field col s6">
+          <div class="btn">
+            <span>File</span>
+            <input type="file">
+          </div>
+          <div class="file-path-wrapper">
+            <input class="file-path validate" type="text" placeholder="Select Video File">
+          </div>
+        </div>
+        <!-- - OR -<br>
+        <label>Video File URL:
+          <input type="text" placeholder="http://file/location">
+        </label><br> -->
+        <div class="input-field col s6">
+          <select></select>
+          <label>Sound Card: </label>
+        </div>
+      </div>
+      <div class="row">
+        <div class="file-field input-field col s6">
+          <div class="btn">
+            <span>File</span>
+            <input type="file">
+          </div>
+          <div class="file-path-wrapper">
+            <input class="file-path validate" type="text" placeholder="Select Audio File">
+          </div>
+        </div>
+        <!-- - OR -<br>
+        <label>Audio File URL:
+          <input type="text" placeholder="http://file/location">
+        </label><br> -->
+        <div class="input-field col s6">
+          <select></select>
+          <label>Sound Card: </label>
+        </div>
+      </div>
+      <div class="row">
+        <div class="file-field input-field col s6">
+          <div class="btn">
+            <span>File</span>
+            <input type="file">
+          </div>
+          <div class="file-path-wrapper">
+            <input class="file-path validate" type="text" placeholder="Select Audio File">
+          </div>
+        </div>
+        <!-- - OR -<br>
+        <label>Audio File URL:
+          <input type="text" placeholder="http://file/location">
+        </label><br> -->
+        <div class="input-field col s6">
+          <select></select>
+          <label>Sound Card: </label>
+        </div>
+      </div>
+      <div class="row">
+        <div class="file-field input-field col s6">
+          <div class="btn">
+            <span>File</span>
+            <input type="file">
+          </div>
+          <div class="file-path-wrapper">
+            <input class="file-path validate" type="text" placeholder="Select Audio File">
+          </div>
+        </div>
+        <div class="input-field col s6">
+          <select></select>
+          <label>Sound Card: </label>
+        </div>
+      </div>
+      <div class="row">
+        <button id="playButton" class="btn-floating btn-large waves-effect waves-light"><i class="material-icons">play_arrow</i></button>
+        <button id="pauseButton" class="btn-floating btn-large waves-effect waves-light"><i class="material-icons">pause</i></button>
+        <button id="fullScreenButton" class="btn-floating btn-large waves-effect waves-light"><i class="material-icons">open_with</i></button>
+      </div>
+    </div>
+  </body>
+</html>
