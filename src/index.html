@@ -6,6 +6,23 @@
     <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.98.2/css/materialize.min.css">
     <style media="screen">
+      video::-webkit-media-controls-play-button,
+      video::-webkit-media-controls-mute-button,
+      video::-webkit-media-controls-seek-back-button,
+      video::-webkit-media-controls-seek-forward-button,
+      video::-webkit-media-controls-rewind-button,
+      video::-webkit-media-controls-volume-slider-container,
+      video::-webkit-media-controls-volume-slider,
+      video::-webkit-media-controls-mute-button {
+        display: none;
+      }
+      video::-webkit-media-controls-panel {
+        pointer-events: none;
+      }
+      video::-webkit-media-controls-fullscreen-button {
+        pointer-events: auto;
+        cursor: pointer;
+      }
       video {
         background-color: black;
         width: 640px;
@@ -65,8 +82,7 @@
 
       pauseButton.click(function() {
         mediaPlayers.each(function(i, player) {
-          if(player.currentTime > 0 && !player.paused && !player.ended 
-    && player.readyState > 2) player.pause();
+          if(player.currentTime > 0 && !player.paused && !player.ended && player.readyState > 2) player.pause();
         });
       });
 
@@ -109,7 +125,7 @@
   <body>
     <div class="container">
       <div class="row">
-        <video class="mediaPlayer"></video>
+        <video class="mediaPlayer" oncontextmenu="return false;"></video>
         <audio class="mediaPlayer"></audio>
         <audio class="mediaPlayer"></audio>
         <audio class="mediaPlayer"></audio>
