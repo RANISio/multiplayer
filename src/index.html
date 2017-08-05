@@ -13,36 +13,40 @@
         margin: auto;
         display: block;
       }
+      #progressBarWrapper {
+        width: 640px;
+        margin: auto;
+      }
     </style>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.98.2/js/materialize.min.js"></script>
     <script type="text/javascript">
     $(document).ready(function() {
       let mediaPlayers = window.mediaPlayers = $('.mediaPlayer'),
-          selectors = $('select'),
+          selects = $('select'),
           fileInputs = $('[type="file"]'),
-          // urlInputs = $('[type="text"]'),
           playButton = $('#playButton'),
           pauseButton = $('#pauseButton'),
-          fullScreenButton = $('#fullScreenButton');
-
+          fullScreenButton = $('#fullScreenButton'),
+          videoPlayer = mediaPlayers[0],
+          progressBar = document.getElementById("progress");
 
       navigator.getUserMedia({
         audio: true,
         video: false
       }, function(localMediaStream) {
-        navigator.mediaDevices.enumerateDevices().then(setDeviceSelectors);
+        navigator.mediaDevices.enumerateDevices().then(setDeviceSelects);
       }, function(err) {
         console.log(err);
       });
 
-      function setDeviceSelectors(devices) {
+      function setDeviceSelects(devices) {
         $.each(devices, function(index, device) {
           if(device.kind === 'audiooutput') {
-            selectors.append($('<option>', {value: device.deviceId, text: device.label}));
+            selects.append($('<option>', {value: device.deviceId, text: device.label}));
           }
         })
-        selectors.material_select();
+        selects.material_select();
       }
 
       playButton.click(function() {
@@ -61,22 +65,43 @@
 
       pauseButton.click(function() {
         mediaPlayers.each(function(i, player) {
-          player.pause();
+          if(player.currentTime > 0 && !player.paused && !player.ended 
+    && player.readyState > 2) player.pause();
         });
       });
 
       fileInputs.each(function(i, input) {
         $(input).change(function(e) {
+          mediaPlayers[i].pause();
           mediaPlayers[i].setAttribute('src', URL.createObjectURL(this.files[0]));
           mediaPlayers[i].load();
         });
       });
 
-      selectors.each(function(i, selector) {
+      selects.each(function(i, selector) {
         $(selector).change(function(e) {
           mediaPlayers[i].setSinkId(e.target.value)
         });
       });
+
+      function setProgressBarValue() {
+        progressBar.max = videoPlayer.duration;
+        progressBar.disabled = false;
+      }
+
+      function progress(e) {
+        progressBar.value = event.target.currentTime;
+      }
+
+      function seekTo() {
+        mediaPlayers.each(function(i, player) {
+          player.currentTime = progressBar.valueAsNumber;
+        });
+      }
+
+      videoPlayer.ontimeupdate = progress;
+      videoPlayer.onloadedmetadata = setProgressBarValue;
+      progressBar.addEventListener('change', seekTo);
     });
 
     </script>
@@ -88,6 +113,9 @@
         <audio class="mediaPlayer"></audio>
         <audio class="mediaPlayer"></audio>
         <audio class="mediaPlayer"></audio>
+      </div>
+      <div class="row" id="progressBarWrapper">
+        <input type="range" id="progress" min="0" value="0" disabled />
       </div>
       <div class="row">
         <div class="file-field input-field col s6">
