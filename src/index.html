@@ -23,6 +23,9 @@
         pointer-events: auto;
         cursor: pointer;
       }
+      .container {
+        padding: 8px;
+      }
       video {
         background-color: black;
         width: 640px;
@@ -39,7 +42,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.98.2/js/materialize.min.js"></script>
     <script type="text/javascript">
     $(document).ready(function() {
-      let mediaPlayers = window.mediaPlayers = $('.mediaPlayer'),
+      var mediaPlayers = window.mediaPlayers = $('.mediaPlayer'),
           selects = $('select'),
           fileInputs = $('[type="file"]'),
           playButton = $('#playButton'),
