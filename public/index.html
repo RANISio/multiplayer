@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Multiplay Player</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.98.2/css/materialize.min.css">
+    <style media="screen">
+      video::-webkit-media-controls-play-button,
+      video::-webkit-media-controls-mute-button,
+      video::-webkit-media-controls-seek-back-button,
+      video::-webkit-media-controls-seek-forward-button,
+      video::-webkit-media-controls-rewind-button,
+      video::-webkit-media-controls-volume-slider-container,
+      video::-webkit-media-controls-volume-slider,
+      video::-webkit-media-controls-mute-button {
+        display: none;
+      }
+      video::-webkit-media-controls-panel {
+        pointer-events: none;
+      }
+      video::-webkit-media-controls-fullscreen-button {
+        pointer-events: auto;
+        cursor: pointer;
+      }
+      .container {
+        padding: 8px;
+      }
+      video {
+        background-color: black;
+        width: 640px;
+        height: 380px;
+        margin: auto;
+        display: block;
+      }
+      #progressBarWrapper {
+        width: 640px;
+        margin: auto;
+      }
+    </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/webrtc-adapter/4.2.2/adapter.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.98.2/js/materialize.min.js"></script>
+    <script type="text/javascript">
+    $(document).ready(function() {
+      var mediaPlayers = window.mediaPlayers = $('.mediaPlayer'),
+          selects = $('select'),
+          fileInputs = $('[type="file"]'),
+          playButton = $('#playButton'),
+          pauseButton = $('#pauseButton'),
+          fullScreenButton = $('#fullScreenButton'),
+          videoPlayer = mediaPlayers[0],
+          progressBar = document.getElementById("progress");
+
+      navigator.getUserMedia({
+        audio: true,
+        video: false
+      }, function(localMediaStream) {
+        navigator.mediaDevices.enumerateDevices().then(setDeviceSelects);
+      }, function(err) {
+        console.log(err);
+      });
+
+      function setDeviceSelects(devices) {
+        $.each(devices, function(index, device) {
+          if(device.kind === 'audiooutput') {
+            selects.append($('<option>', {value: device.deviceId, text: device.label}));
+          }
+        })
+        selects.material_select();
+      }
+
+      playButton.click(function() {
+
+      });
+
+      fullScreenButton.click(function() {
+        mediaPlayers[0].webkitEnterFullscreen();
+      });
+
+      playButton.click(function() {
+        mediaPlayers.each(function(i, player) {
+          player.play();
+        });
+      });
+
+      pauseButton.click(function() {
+        mediaPlayers.each(function(i, player) {
+          if(player.currentTime > 0 && !player.paused && !player.ended && player.readyState > 2) player.pause();
+        });
+      });
+
+      fileInputs.each(function(i, input) {
+        $(input).change(function(e) {
+          mediaPlayers[i].pause();
+          mediaPlayers[i].setAttribute('src', URL.createObjectURL(this.files[0]));
+          mediaPlayers[i].load();
+        });
+      });
+
+      selects.each(function(i, selector) {
+        $(selector).change(function(e) {
+          mediaPlayers[i].setSinkId(e.target.value)
+        });
+      });
+
+      function setProgressBarValue() {
+        progressBar.max = videoPlayer.duration;
+        progressBar.disabled = false;
+      }
+
+      function progress(e) {
+        progressBar.value = event.target.currentTime;
+      }
+
+      function seekTo() {
+        mediaPlayers.each(function(i, player) {
+          player.currentTime = progressBar.valueAsNumber;
+        });
+      }
+
+      videoPlayer.ontimeupdate = progress;
+      videoPlayer.onloadedmetadata = setProgressBarValue;
+      progressBar.addEventListener('change', seekTo);
+    });
+
+    </script>
+  </head>
+  <body>
+    <div class="container">
+      <div class="row">
+        <video class="mediaPlayer" oncontextmenu="return false;" controls></video>
+        <audio class="mediaPlayer"></audio>
+        <audio class="mediaPlayer"></audio>
+        <audio class="mediaPlayer"></audio>
+      </div>
+      <div class="row" id="progressBarWrapper">
+        <input type="range" id="progress" min="0" value="0" disabled />
+      </div>
+      <div class="row">
+        <div class="file-field input-field col s6">
+          <div class="btn">
+            <span>File</span>
+            <input type="file">
+          </div>
+          <div class="file-path-wrapper">
+            <input class="file-path validate" type="text" placeholder="Select Video File">
+          </div>
+        </div>
+        <div class="input-field col s6">
+          <select></select>
+          <label>Sound Card: </label>
+        </div>
+      </div>
+      <div class="row">
+        <div class="file-field input-field col s6">
+          <div class="btn">
+            <span>File</span>
+            <input type="file">
+          </div>
+          <div class="file-path-wrapper">
+            <input class="file-path validate" type="text" placeholder="Select Audio File">
+          </div>
+        </div>
+        <div class="input-field col s6">
+          <select></select>
+          <label>Sound Card: </label>
+        </div>
+      </div>
+      <div class="row">
+        <div class="file-field input-field col s6">
+          <div class="btn">
+            <span>File</span>
+            <input type="file">
+          </div>
+          <div class="file-path-wrapper">
+            <input class="file-path validate" type="text" placeholder="Select Audio File">
+          </div>
+        </div>
+        <div class="input-field col s6">
+          <select></select>
+          <label>Sound Card: </label>
+        </div>
+      </div>
+      <div class="row">
+        <div class="file-field input-field col s6">
+          <div class="btn">
+            <span>File</span>
+            <input type="file">
+          </div>
+          <div class="file-path-wrapper">
+            <input class="file-path validate" type="text" placeholder="Select Audio File">
+          </div>
+        </div>
+        <div class="input-field col s6">
+          <select></select>
+          <label>Sound Card: </label>
+        </div>
+      </div>
+      <div class="row">
+        <button id="playButton" class="btn-floating btn-large waves-effect waves-light"><i class="material-icons">play_arrow</i></button>
+        <button id="pauseButton" class="btn-floating btn-large waves-effect waves-light"><i class="material-icons">pause</i></button>
+        <button id="fullScreenButton" class="btn-floating btn-large waves-effect waves-light"><i class="material-icons">open_with</i></button>
+      </div>
+    </div>
+  </body>
+</html>
